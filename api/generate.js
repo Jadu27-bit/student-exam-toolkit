@@ -22,9 +22,7 @@ export default async function handler(req, res) {
           const oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(ytUrl)}&format=json`;
           const oembedRes = await fetch(oembedUrl);
 
-          if (!oembedRes.ok) {
-            throw new Error('Invalid YouTube URL');
-          }
+          if (!oembedRes.ok) throw new Error('Invalid YouTube URL');
 
           const oembedData = await oembedRes.json();
           const videoTitle = oembedData.title || '';
@@ -63,7 +61,7 @@ Lecture Info:
 ${contentToSummarize}`
       : `You are an expert academic tutor. Based on the following lecture transcript/text, create:
 1. CLEAN REVISION NOTES: Structured, easy-to-memorize bullet points covering all key concepts, definitions, and formulas.
-2. 5 MULTIPLE-CHOICE QUESTIONS (MCQs): 5 exam-style questions with 4 options (A, B, C, D) and provide the Answer Key with brief explanations at the very bottom.
+2. 5 MULTIPLE-CHOICE QUESTIONS (MCQs): 5 exam-style questions with 4 options (A, B, C, D) and provide the Answer Key with brief explanations at the bottom.
 
 Content:
 ${contentToSummarize}`;
@@ -75,7 +73,7 @@ ${contentToSummarize}`;
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
+        model: 'llama-3.1-8b-instant',
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.5
       })
