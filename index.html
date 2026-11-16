@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Toolkit Pro - PDF, Photo & AI Study Hub</title>
+    <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.1/dist/browser-image-compression.js"></script>
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e0e7ff 100%);
+            color: #1e293b;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 24px 16px 20px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(79, 70, 229, 0.25);
+            border-bottom-left-radius: 24px;
+            border-bottom-right-radius: 24px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.18);
+            color: #e0e7ff;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-bottom: 6px;
+        }
+
+        header h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+        header p { font-size: 12px; color: #e0e7ff; margin-top: 3px; }
+
+        /* 4-Tab Navigation */
+        .tabs {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            max-width: 460px;
+            margin: 16px auto 0;
+            padding: 0 12px;
+            width: 100%;
+        }
+
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid #cbd5e1;
+            color: #475569;
+            padding: 10px 4px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .tab-btn.active {
+            background: #4f46e5;
+            color: white;
+            border-color: #4f46e5;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+        }
+
+        main {
+            flex: 1;
+            width: 100%;
+            max-width: 460px;
+            margin: 0 auto;
+            padding: 16px 12px;
+        }
+
+        .tool-section { display: none; }
+        .tool-section.active { display: block; }
+
+        .card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            margin-bottom: 16px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .icon-box {
+            width: 42px;
+            height: 42px;
+            background: #eef2ff;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .card-header h2 { font-size: 16px; font-weight: 700; color: #0f172a; }
+        .card-header p { font-size: 12px; color: #64748b; margin-top: 2px; }
+
+        .form-group { margin-bottom: 14px; }
+
+        label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        input[type="file"], input[type="text"], select, textarea {
+            width: 100%;
+            padding: 11px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 12px;
+            background: #f8fafc;
+            font-size: 13px;
+            color: #334155;
+            outline: none;
+        }
+
+        textarea { resize: vertical; min-height: 100px; }
+
+        .divider {
+            text-align: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: #94a3b8;
+            margin: 12px 0;
+        }
+
+        .btn-primary {
+            width: 100%;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            padding: 13px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 6px 15px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .result-box {
+            display: none;
+            margin-top: 16px;
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            border-radius: 14px;
+            padding: 14px;
+            text-align: center;
+        }
+
+        .result-box p { font-size: 13px; font-weight: 600; color: #065f46; margin-bottom: 10px; }
+
+        .btn-download {
+            display: block;
+            width: 100%;
+            background: #10b981;
+            color: white;
+            text-decoration: none;
+            padding: 11px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        /* AI Output Formatting */
+        .ai-output {
+            display: none;
+            margin-top: 18px;
+            background: #f8fafc;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 14px;
+            padding: 16px;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #1e293b;
+            white-space: pre-wrap;
+        }
+
+        .trust-card {
+            background: rgba(255, 255, 255, 0.65);
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 14px;
+            text-align: center;
+        }
+
+        .trust-card h3 { font-size: 12px; font-weight: 700; color: #312e81; }
+        .trust-card p { font-size: 11px; color: #64748b; margin-top: 3px; line-height: 1.4; }
+        footer { text-align: center; padding: 16px; font-size: 11px; color: #94a3b8; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <span class="badge">Student Utility Hub</span>
+        <h1>Exam Toolkit Pro</h1>
+        <p>Photo Resizer, PDF Tools & AI Lecture Notes</p>
+    </header>
+
+    <!-- 4 Navigation Tabs -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('resizer', this)">📸 Resizer</button>
+        <button class="tab-btn" onclick="switchTab('img2pdf', this)">📄 Img→PDF</button>
+        <button class="tab-btn" onclick="switchTab('mergepdf', this)">🔗 Merge</button>
+        <button class="tab-btn" onclick="switchTab('ainotes', this)">✨ AI Notes</button>
+    </div>
+
+    <main>
+        <!-- TAB 1: Photo Resizer -->
+        <div id="resizer" class="tool-section active">
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon-box">📸</div>
+                    <div>
+                        <h2>Photo & Signature Resizer</h2>
+                        <p>Exact KB limits for exam & college portals</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>1. Select Photo or Signature</label>
+                    <input type="file" id="imageInput" accept="image/*">
+                </div>
+                <div class="form-group">
+                    <label>2. Target Max Size</label>
+                    <select id="maxSizeKB">
+                        <option value="20">20 KB (Standard Signature)</option>
+                        <option value="50" selected>50 KB (Standard Photo)</option>
+                        <option value="100">100 KB (Document Scan)</option>
+                    </select>
+                </div>
+                <button class="btn-primary" onclick="compressImage()">Compress & Prepare Download</button>
+                <div id="resizerResult" class="result-box">
+                    <p id="resizerText"></p>
+                    <a id="resizerDownload" class="btn-download">⬇️ Download Resized File</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: Image to PDF -->
+        <div id="img2pdf" class="tool-section">
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon-box">📄</div>
+                    <div>
+                        <h2>Images to Single PDF</h2>
+                        <p>Turn multiple notes or doc photos into 1 PDF</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Select Multiple Images (JPG / PNG)</label>
+                    <input type="file" id="imgPdfInput" accept="image/jpeg, image/png" multiple>
+                </div>
+                <button class="btn-primary" onclick="imagesToPdf()">Create PDF Document</button>
+                <div id="imgPdfResult" class="result-box">
+                    <p id="imgPdfText"></p>
+                    <a id="imgPdfDownload" class="btn-download">⬇️ Download Combined PDF</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: Merge PDFs -->
+        <div id="mergepdf" class="tool-section">
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon-box">🔗</div>
+                    <div>
+                        <h2>Merge PDF Files</h2>
+                        <p>Combine marksheets, IDs & certificates into 1 PDF</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Select 2 or More PDF Files</label>
+                    <input type="file" id="mergePdfInput" accept="application/pdf" multiple>
+                </div>
+                <button class="btn-primary" onclick="mergePdfs()">Merge PDFs Now</button>
+                <div id="mergePdfResult" class="result-box">
+                    <p id="mergePdfText"></p>
+                    <a id="mergePdfDownload" class="btn-download">⬇️ Download Merged PDF</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: AI Notes & Quiz Generator -->
+        <div id="ainotes" class="tool-section">
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon-box">✨</div>
+                    <div>
+                        <h2>AI Notes & Quiz Generator</h2>
+                        <p>Paste a YouTube link or messy notes for revision + 5 MCQs</p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Option A: Paste YouTube Lecture Link</label>
+                    <input type="text" id="ytUrl" placeholder="https://www.youtube.com/watch?v=...">
+                </div>
+
+                <div class="divider">— OR —</div>
+
+                <div class="form-group">
+                    <label>Option B: Paste Article, Topic, or Messy Notes</label>
+                    <textarea id="rawNotes" placeholder="Paste your lecture text, article, or type a topic (e.g., Right to Information Act 2005)..."></textarea>
+                </div>
+
+                <button id="aiBtn" class="btn-primary" onclick="generateStudyMaterial()">Generate Notes & 5 MCQs</button>
+
+                <div id="aiOutputBox" class="ai-output"></div>
+            </div>
+        </div>
+
+        <div class="trust-card">
+            <h3>🔒 Fast & Student-Friendly</h3>
+            <p>PDF & Photo tools run 100% offline on your phone. AI Notes runs securely on the cloud.</p>
+        </div>
+    </main>
+
+    <footer>
+        Built for Students & Candidates • Exam Toolkit Pro
+    </footer>
+
+    <script>
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tool-section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        // 1. Photo Resizer
+        async function compressImage() {
+            const fileInput = document.getElementById('imageInput');
+            const maxSizeKB = parseInt(document.getElementById('maxSizeKB').value);
+            const resultArea = document.getElementById('resizerResult');
+            const successText = document.getElementById('resizerText');
+            const downloadLink = document.getElementById('resizerDownload');
+
+            if (fileInput.files.length === 0) return alert('Please select an image first!');
+            const imageFile = fileInput.files[0];
+            const options = { maxSizeMB: maxSizeKB / 1024, maxWidthOrHeight: 1024, useWebWorker: true };
+
+            try {
+                successText.innerText = "⏳ Compressing image...";
+                resultArea.style.display = "block";
+                const compressedFile = await imageCompression(imageFile, options);
+                const finalSizeKB = (compressedFile.size / 1024).toFixed(1);
+                successText.innerText = `✨ Done! New size: ${finalSizeKB} KB`;
+                downloadLink.href = URL.createObjectURL(compressedFile);
+                downloadLink.download = `exam_resized_${imageFile.name}`;
+            } catch (error) {
+                alert('Error compressing image.');
+                resultArea.style.display = "none";
+            }
+        }
+
+        // 2. Images to PDF
+        async function imagesToPdf() {
+            const fileInput = document.getElementById('imgPdfInput');
+            const resultArea = document.getElementById('imgPdfResult');
+            const successText = document.getElementById('imgPdfText');
+            const downloadLink = document.getElementById('imgPdfDownload');
+
+            if (fileInput.files.length === 0) return alert('Please select at least 1 image!');
+            try {
+                successText.innerText = "⏳ Creating PDF...";
+                resultArea.style.display = "block";
+                const { PDFDocument } = PDFLib;
+                const pdfDoc = await PDFDocument.create();
+
+                for (const file of fileInput.files) {
+                    const arrayBuffer = await file.arrayBuffer();
+                    let image = (file.type === 'image/png') ? await pdfDoc.embedPng(arrayBuffer) : await pdfDoc.embedJpg(arrayBuffer);
+                    const page = pdfDoc.addPage([image.width, image.height]);
+                    page.drawImage(image, { x: 0, y: 0, width: image.width, height: image.height });
+                }
+
+                const pdfBytes = await pdfDoc.save();
+                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                successText.innerText = `✨ PDF created (${fileInput.files.length} page(s))!`;
+                downloadLink.href = URL.createObjectURL(blob);
+                downloadLink.download = "Student_Notes_Combined.pdf";
+            } catch (err) {
+                alert('Error creating PDF. Ensure files are JPG or PNG.');
+                resultArea.style.display = "none";
+            }
+        }
+
+        // 3. Merge PDFs
+        async function mergePdfs() {
+            const fileInput = document.getElementById('mergePdfInput');
+            const resultArea = document.getElementById('mergePdfResult');
+            const successText = document.getElementById('mergePdfText');
+            const downloadLink = document.getElementById('mergePdfDownload');
+
+            if (fileInput.files.length < 2) return alert('Please select at least 2 PDF files!');
+            try {
+                successText.innerText = "⏳ Merging PDFs...";
+                resultArea.style.display = "block";
+                const { PDFDocument } = PDFLib;
+                const mergedPdf = await PDFDocument.create();
+
+                for (const file of fileInput.files) {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const pdf = await PDFDocument.load(arrayBuffer);
+                    const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+                    copiedPages.forEach((page) => mergedPdf.addPage(page));
+                }
+
+                const mergedBytes = await mergedPdf.save();
+                const blob = new Blob([mergedBytes], { type: 'application/pdf' });
+                successText.innerText = `✨ Merged ${fileInput.files.length} PDFs!`;
+                downloadLink.href = URL.createObjectURL(blob);
+                downloadLink.download = "Merged_Exam_Documents.pdf";
+            } catch (err) {
+                alert('Error merging PDFs.');
+                resultArea.style.display = "none";
+            }
+        }
+
+        // 4. AI Notes & Quiz Generator (Calls our Vercel Serverless Function)
+        async function generateStudyMaterial() {
+            const ytUrl = document.getElementById('ytUrl').value.trim();
+            const rawNotes = document.getElementById('rawNotes').value.trim();
+            const outputBox = document.getElementById('aiOutputBox');
+            const btn = document.getElementById('aiBtn');
+
+            if (!ytUrl && !rawNotes) {
+                return alert('Please paste a YouTube link OR paste some notes/topic first!');
+            }
+
+            btn.disabled = true;
+            btn.innerText = "⏳ Generating Notes & Quiz...";
+            outputBox.style.display = "block";
+            outputBox.innerText = "Fetching content and generating revision notes & 5 MCQs... Please wait 5-10 seconds.";
+
+            try {
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ytUrl, rawNotes })
+                });
+
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Failed to generate notes.');
+
+                outputBox.innerText = data.result;
+            } catch (error) {
+                outputBox.innerText = "❌ Error: " + error.message + "\n\n(Note: Make sure the site is deployed on Vercel with your API key added!)";
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Generate Notes & 5 MCQs";
+            }
+        }
+    </script>
+</body>
+</html>
